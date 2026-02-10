@@ -36,7 +36,8 @@ export const sendMetaEvent = async (eventName: string, customData: any = {}) => 
                 custom_data: {
                     currency: "USD",
                     ...customData
-                }
+                },
+                test_event_code: "TEST70646"
             }
         ]
     };
