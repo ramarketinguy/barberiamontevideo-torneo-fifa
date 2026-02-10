@@ -13,27 +13,31 @@ const getCookie = (name: string) => {
  * Utility to send events to Meta Conversions API (CAPI) via secure API proxy
  */
 export const sendMetaEvent = async (eventName: string, customData: any = {}) => {
-    // Basic payload structure based on Meta Conversions API requirements
+    if (typeof window === 'undefined') return;
+
     const payload = {
         data: [
             {
                 event_name: eventName,
                 event_time: Math.floor(Date.now() / 1000),
                 action_source: "website",
-                event_source_url: typeof window !== 'undefined' ? window.location.href : '',
+                event_source_url: window.location.href,
                 user_data: {
-                    client_user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-                    fbc: getCookie('_fbc'),
-                    fbp: getCookie('_fbp'),
+                    client_user_agent: navigator.userAgent,
+                    fbc: getCookie('_fbc') || null,
+                    fbp: getCookie('_fbp') || null,
                 },
                 custom_data: {
-                    currency: "UYU",
                     ...customData
                 }
             }
         ],
-        test_event_code: "TEST70646" // Keep this while testing
     };
+
+    // Convert value to number if present
+    if (payload.data[0].custom_data.value) {
+        payload.data[0].custom_data.value = parseFloat(payload.data[0].custom_data.value);
+    }
 
     try {
         const response = await fetch('/api/event', {
@@ -45,13 +49,9 @@ export const sendMetaEvent = async (eventName: string, customData: any = {}) => 
         });
 
         const result = await response.json();
-        if (result.error) {
-            console.error('Meta Proxy Error:', result.error);
-        } else {
-            console.log('Meta Event Sent Successfully via Proxy:', eventName, result);
-        }
+        console.log('Meta Event Attempt:', eventName, result);
         return result;
     } catch (error) {
-        console.error('Error calling Meta Proxy:', error);
+        console.error('Meta Event Error:', error);
     }
 };
