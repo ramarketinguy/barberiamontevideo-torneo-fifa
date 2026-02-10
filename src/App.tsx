@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { sendMetaEvent } from './utils/meta-events';
+
 
 // Logo de la Barbería (imagen proporcionada)
 const BARBERSHOP_LOGO = '/logo-barberia.png';
@@ -141,8 +143,8 @@ const FloatingParticle = ({ delay, size, left, duration }: { delay: number; size
 );
 
 // Hexagon decoration
-const HexDecoration = ({ className = '' }: { className?: string }) => (
-  <div className={`absolute pointer-events-none ${className}`}>
+const HexDecoration = ({ className = '', style = {} }: { className?: string; style?: React.CSSProperties }) => (
+  <div className={`absolute pointer-events-none ${className}`} style={style}>
     <svg viewBox="0 0 100 100" className="w-full h-full" style={{ filter: 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.3))' }}>
       <polygon
         points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5"
@@ -162,6 +164,7 @@ const WhatsAppFloating = () => {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => sendMetaEvent('Contact')}
       className="fixed bottom-6 right-6 z-50 group flex items-center justify-center"
       aria-label="Contactar por WhatsApp"
     >
@@ -200,6 +203,8 @@ export function App() {
 
   useEffect(() => {
     setIsVisible(true);
+    // Track page view
+    sendMetaEvent('ViewContent');
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -527,6 +532,8 @@ export function App() {
                 href="https://wa.me/59898057705?text=Hola%21+Quiero+reservar+mi+lugar+para+el+torneo+de+FIFA.+Adjunto+el+comprobante+de+transferencia.+Mi+nombre+es%3A+"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => sendMetaEvent('Purchase', { value: "1000.00", currency: "UYU" })}
+
                 className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white font-orbitron font-bold text-lg md:text-xl rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-[0_0_40px_rgba(34,197,94,0.5)] animate-pulse"
               >
                 <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
